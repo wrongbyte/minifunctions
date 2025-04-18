@@ -22,4 +22,11 @@ if ! psql -lqt | cut -d \| -f 1 | grep -qw "$PGDATABASE" 2>/dev/null; then
   createdb "$PGDATABASE"
 fi
 
+if [ -f ./database/init.sql ]; then
+  echo "Running initialization SQL script..."
+  psql -d "$PGDATABASE" -f ./database/init.sql
+else
+  echo "Note: ./database/init.sql not found, skipping initialization script."
+fi
+
 echo "PostgreSQL setup complete!"
