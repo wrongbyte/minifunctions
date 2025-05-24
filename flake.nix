@@ -18,13 +18,14 @@
       };
       rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       postgresql = pkgs.postgresql_15;
-
+      jq = pkgs.jq;
     in 
     with pkgs; {
       devShells.default = pkgs.mkShell {
         buildInputs = [
           rustToolchain
           postgresql
+          jq
         ];
       # TODO: run `initdb` if no PGDATA (or not pg_isready)
         shellHook = ''
@@ -34,7 +35,7 @@
           export PGUSER=$(whoami)
           export PGPASSWORD=postgres
           export LOG_PATH="$PGHOST/log"
-          export DATABASE_URL="postgres://$PGUSER:$PGPASSWORD@$PGHOST/$PGDATABASE"
+          export DATABASE_URL="postgres://$PGUSER:$PGPASSWORD@$(echo $PGHOST | jq -Rr '@uri')/$PGDATABASE"
           
           if [ -f ./database/init.sh ]; then
             chmod +x ./database/init.sh

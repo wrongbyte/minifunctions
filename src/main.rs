@@ -3,7 +3,7 @@ use std::sync::{Arc, LazyLock};
 use anyhow::Context;
 use axum::Router;
 use deno_core::{error::AnyError, op2, Extension, JsRuntime, OpDecl, RuntimeOptions};
-use sqlx::{postgres::PgPoolOptions, Pool};
+use sqlx::postgres::PgPoolOptions;
 use tenants::repository::{DynTenantRepository, SqlTenantRepository};
 use uuid::Uuid;
 mod errors;
@@ -22,14 +22,12 @@ pub fn op_hello() {
     println!("Hello from Rust");
 }
 
-// TODO: remove tenant from path
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
     let host = std::env::var("DATABASE_URL").expect("failed to get database url");
-    dbg!(&host);
     let pool = PgPoolOptions::new()
         .max_connections(100)
-        .connect(&std::env::var("DATABASE_URL").expect("failed to get database url"))
+        .connect(&host)
         .await
         .context("failed to connect to database")?;
     let tenants_repository = SqlTenantRepository { pool };

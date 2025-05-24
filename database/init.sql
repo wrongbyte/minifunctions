@@ -1,3 +1,5 @@
+CREATE DATABASE minifunctions;
+
 -- TODO: improve the tenants table
 CREATE TABLE IF NOT EXISTS tenants (
     tenant_id UUID PRIMARY KEY,
